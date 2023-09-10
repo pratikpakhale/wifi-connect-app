@@ -14,7 +14,7 @@ const App: React.FC = () => {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
-  const callApi = async (url: string, body: string) => {
+  const callApi = async (url?: string, body?: string) => {
     try {
       const response = await fetch(url, {
         method: 'POST',
@@ -51,8 +51,10 @@ const App: React.FC = () => {
     try {
       const result = await callApi(loginUrl, requestBody.toString());
       setLoginResponse(result);
-    } catch (error) {
+    } catch (error: Error | any) {
+      setLoginResponse(error?.message);
       setLoginResponse('Error occurred during login.');
+      return false;
     }
   }, [username, password]);
 
@@ -85,10 +87,14 @@ const App: React.FC = () => {
 
         if (storedPassword) {
           setPassword(storedPassword);
+        } else {
+          setLoginResponse('no stored credentials found. please reenter.');
         }
-        handleLogin();
+        setTimeout(async () => {
+          await handleLogin();
+        }, 1000);
       } catch (error) {
-        console.error('Error loading stored credentials:', error);
+        console.error('Error = loading stored credentials:', error);
       }
     };
 
